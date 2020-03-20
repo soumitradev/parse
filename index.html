@@ -11,17 +11,142 @@
     <title>Text Parser</title>
     <meta name="description" content="
     A simple and powerful text parser that can sort lists, manipulate data,
-    and do pretty much everything you can imagine, and more.">
+    and do pretty much everything you want.">
     
     <script src="./js/jquery.min.js"></script>
     <script>
     $(function() {
-        $(document).ready(function(){
-            $('select').formSelect();
-        });
 
         $(document).ready(function(){
+            $('select').formSelect();
             $('.collapsible').collapsible();
+        });
+
+        $("#parse-button").click(function(){
+            var inputText = $("#input-text").val();
+            var delimiterText = $("#delimiter-text").val();
+            var list = inputText.split(delimiterText);
+            var sortPref = $("#sort-pref").val();
+            var findText = $("#find-text").val();
+            var replaceText = $("#replace-text").val();
+            var prefixText = $("#prefix-text").val();
+            var suffixText = $("#suffix-text").val();
+            var casePref = $("#case-pref").val();
+            var reversePref = $('#reverse-pref').prop('checked');
+            var duplicatesPref = $('#duplicates-pref').prop('checked');
+            var itemReversePref = $('#item-reverse-pref').prop('checked');
+
+            // Fisher-Yates (aka Knuth) Shuffle, not mine
+            function shuffle(array) {
+                var currentIndex = array.length, temporaryValue, randomIndex;
+
+                // While there remain elements to shuffle...
+                while (0 !== currentIndex) {
+
+                    // Pick a remaining element...
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+
+                    // And swap it with the current element.
+                    temporaryValue = array[currentIndex];
+                    array[currentIndex] = array[randomIndex];
+                    array[randomIndex] = temporaryValue;
+                }
+
+                return array;
+            }
+
+            switch (sortPref) {
+                case "none":
+                    break;
+                case "alpha":
+                    list = list.sort();
+                    break;
+                case "num":
+                    list = list.sort(function(x, y){a = parseInt(x); b = parseInt(y); return a > b ? 1 : b > a ? -1 : 0;});
+                    break;
+                case "len":
+                    list = list.sort(function(a, b){return a.length > b.length ? 1 : b.length > a.length ? -1 : 0;});
+                    break;
+                case "rand":
+                    shuffle(list);
+                    break;
+                default:
+                    break;
+            }
+
+            for (var i = 0; i < list.length; i++){
+                list[i] = prefixText + list[i] + suffixText;
+                switch (casePref) {
+                    case "none":
+                        break;
+                    case "low":
+                        list[i] = list[i].toLowerCase();
+                        break;
+                    case "up":
+                        list[i] = list[i].toUpperCase();
+                        break;
+                    case "sentence":
+                        var wordList = list[i].toLowerCase().split(" ");
+                        wordList[0] = wordList[0][0].toUpperCase() + wordList[0].slice(1);
+                        list[i] = wordList.join(" ");
+                        break;
+                    case "capeach":
+                        var wordList = list[i].toLowerCase().split(" ");
+                        for (var j = 0; j < wordList.length; j++){
+                            wordList[j] = wordList[j][0].toUpperCase() + wordList[j].slice(1);
+                        }
+                        list[i] = wordList.join(" ");
+                        break;
+                    case "alt":
+                        var altText = list[i];
+                        var tmp = "";
+                        for (var k = 0; k < altText.length; k++){
+                            if (k%2 == 0){
+                                tmp += altText[k].toLowerCase();
+                            } else {
+                                tmp += altText[k].toUpperCase();
+                            }
+                        }
+                        list[i] = tmp;
+                        break;
+                    case "rand":
+                        var randText = list[i];
+                        var tmp = "";
+                        for (var l = 0; l < randText.length; l++){
+                            if (Math.random() < 0.5){
+                                tmp += randText[l].toLowerCase();
+                            } else {
+                                tmp += randText[l].toUpperCase();
+                            }
+                        }
+                        list[i] = tmp;
+                        break;
+                    default:
+                        break;
+                }
+                
+                list[i] = itemReversePref ? list[i].split("").reverse().join("") : list[i];
+            }
+
+            list = reversePref ? list.reverse() : list;
+
+            list = duplicatesPref ? [...new Set(list)] : list;
+
+            if (delimiterText.includes("\\n")){
+                var newlinere = new RegExp("\\n", "g");
+                delimiterText = delimiterText.replace(newlinere, "\\n");
+
+                var re = new RegExp(findText, "g");
+                var outputText = list.join(delimiterText);
+                outputText = outputText.replace(re, replaceText);
+            } else {
+                var outputText = list.join(delimiterText);
+                var re = new RegExp(findText, "g");
+                outputText = outputText.replace(re, replaceText);
+            }
+
+            $("#output-text").text(outputText);
         });
     });
     </script>
@@ -32,9 +157,6 @@
         <div class="nav-wrapper">
             <a href="#" class="brand-logo center" style="font-family: Roboto;
             font-weight: 500;">Text Parser</a>
-            <ul id="nav-mobile" class="right waves-effect waves-light" style="height: 100%;">
-                <li><a><i class="material-icons-round">brightness_4</i></a></li>
-            </ul>
         </div>
     </nav>
 
@@ -45,7 +167,7 @@
                 font-weight: 300;">Input Text:</h5>
                 <div class="row">
                     <div class="input-field col s12">
-                        <textarea id="input-text" class="materialize-textarea" 
+                        <textarea id="input-text" class="materialize-textarea"
                         style="font-family: Roboto Mono; font-weight: 100; color: white;"></textarea>
                         <label for="input-text" style="font-family: Roboto Mono;
                         font-weight: 100;">Text to parse</label>
@@ -59,7 +181,7 @@
                     font-family: Roboto Mono;">
                     <label for="delimiter-text" style="font-family: Roboto Mono;">Delimiter</label>
                 </div>
-                <a class="btn-floating btn-large waves-effect waves-light blue hoverable">
+                <a class="btn-floating btn-large waves-effect waves-light blue hoverable" id="parse-button">
                     <i class="material-icons-round">play_arrow</i>
                 </a>
             </div>
@@ -67,11 +189,10 @@
             <form class="col s5">
                 <h5 style="color: white; font-size: x-large; font-family: Roboto;
                 font-weight: 300;">Output Text:</h5>
-                <div class="row right-align">
+                <div class="row">
                     <div class="input-field col s12">
-                        <input disabled value="Parsed text goes here"
-                        type="text" class="validate" style="font-family: Roboto Mono;
-                        font-weight: 100; color: white;" id="output-text">
+                        <p type="text" class="flow-text" style="font-family: Roboto Mono;
+                        font-weight: 100; color: white; font-size: 110%;" id="output-text">Parsed text goes here</p>
                     </div>
                 </div>
             </form>
@@ -84,18 +205,18 @@
                         <h6 style="font-family: Roboto; font-size: large; font-weight: 200; color: white;">Sort</h6>
                     </div>
                     <div class="collapsible-body blue-grey darken-4">
-                        <select>
+                        <select id="sort-pref">
                             <option value="none" selected>None</option>
                             <option value="alpha">Alphabetical</option>
                             <option value="num">Numeric</option>
                             <option value="len">Length</option>
                             <option value="rand">Shuffle</option>
                         </select>
-                        <div class="switch" style="padding-top: 1%;">
-                            <label>
-                                <label style="font-family: Roboto; font-weight: 100; font-size: small;">Reverse</label>
-                                <input type="checkbox">
+                        <div class="switch valign-wrapper" style="padding-top: 1%;">
+                            <label class="valign-wrapper">
+                                <input type="checkbox" id="reverse-pref">
                                 <span class="lever"></span>
+                                <label style="font-family: Roboto; font-weight: 100; font-size: small;">Reverse</label>
                             </label>
                         </div>
                     </div>
@@ -108,11 +229,11 @@
                     <div class="collapsible-body blue-grey darken-4">
                         <div class="row">
                             <div class="input-field col s6">
-                                <input id="find-text" type="text" style="color: white;">
+                                <input id="find-text" type="text" style="color: white; font-family: Roboto; font-weight: 200;">
                                 <label for="find-text" style="font-family: Roboto; font-weight: 100;">Find</label>
                             </div>
                             <div class="input-field col s6">
-                                <input id="replace-text" type="text"" style="color: white;">
+                                <input id="replace-text" type="text"" style="color: white; font-family: Roboto; font-weight: 200;">
                                 <label for="replace-text" style="font-family: Roboto; font-weight: 100;">Replace</label>
                             </div>
                         </div>
@@ -126,11 +247,11 @@
                     <div class="collapsible-body blue-grey darken-4">
                         <div class="row">
                             <div class="input-field col s6">
-                                <input id="prefix-text" type="text" style="color: white;">
+                                <input id="prefix-text" type="text" style="color: white; font-family: Roboto; font-weight: 200;">
                                 <label for="prefix-text" style="font-family: Roboto; font-weight: 100;">Prefix</label>
                             </div>
                             <div class="input-field col s6">
-                                <input id="suffix-text" type="text"" style="color: white;">
+                                <input id="suffix-text" type="text"" style="color: white; font-family: Roboto; font-weight: 200;">
                                 <label for="suffix-text" style="font-family: Roboto; font-weight: 100;">Suffix</label>
                             </div>
                         </div>
@@ -143,14 +264,14 @@
                     </div>
                     <div class="collapsible-body blue-grey darken-4">
                         <div class="row" style="color: white;">
-                            <select>
-                                <option value="0" selected>None</option>
-                                <option value="1">lowercase</option>
-                                <option value="2">UPPERCASE</option>
-                                <option value="3">Sentence case</option>
-                                <option value="4">Capitalize Each Word</option>
-                                <option value="5">aLtErNaTe CaSe</option>
-                                <option value="6">RanDOM CasE</option>
+                            <select id="case-pref">
+                                <option value="none" selected>None</option>
+                                <option value="low">lowercase</option>
+                                <option value="up">UPPERCASE</option>
+                                <option value="sentence">Sentence case</option>
+                                <option value="capeach">Capitalize Each Word</option>
+                                <option value="alt">aLtErNaTe CaSe</option>
+                                <option value="rand">RanDOM CasE</option>
                             </select>
                             <label>Cases</label>
                         </div>
@@ -166,16 +287,7 @@
                             <p>
                                 <div class="switch valign-wrapper" style="padding-top: 1%;">
                                     <label class="valign-wrapper">
-                                        <input type="checkbox">
-                                        <span class="lever"></span>                                        
-                                        <label style="font-family: Roboto; font-weight: 100; font-size: medium;">Beautify</label>
-                                    </label>
-                                </div>
-                            </p>
-                            <p>
-                                <div class="switch valign-wrapper" style="padding-top: 1%;">
-                                    <label class="valign-wrapper">
-                                        <input type="checkbox">
+                                        <input type="checkbox" id="duplicates-pref">
                                         <span class="lever"></span>
                                         <label style="font-family: Roboto; font-weight: 100; font-size: medium;">Remove Duplicates</label>
                                     </label>
@@ -184,7 +296,7 @@
                             <p>
                                 <div class="switch valign-wrapper" style="padding-top: 1%;">
                                     <label class="valign-wrapper">
-                                        <input type="checkbox">
+                                        <input type="checkbox" id="item-reverse-pref">
                                         <span class="lever"></span>
                                         <label style="font-family: Roboto; font-weight: 100; font-size: medium;">Reverse Each Item</label>
                                     </label>
@@ -196,7 +308,29 @@
             </ul>
         </div>
     </div>
+    
+    <footer class="page-footer blue-grey darken-4">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text" style="font-family: Roboto; font-weight: 400;">Text Parser</h5>
+                    <p class="grey-text text-lighten-4" style="font-family: Roboto; font-weight: 200;">A simple and powerful text parser that can sort lists,
+                    manipulate data, and do pretty much everything you want. Except handling new lines. Welp.</p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text" style="font-family: Roboto; font-weight: 200;">Made by Soumitra Shewale (soumitradev)</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" style="font-family: Roboto; font-weight: 500;" href="https://github.com/soumitradev">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+            </div>
+        </div>
+    </footer>
+
     <script type="text/javascript" src="./js/materialize.min.js"></script>
-</script>
 </body>
 </html>
