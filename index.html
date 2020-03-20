@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link type="text/css" rel="stylesheet" href="./css/styles.css">
+    <link type="text/css" rel="stylesheet" href="./css/fonts.css">
+    <link type="text/css" rel="stylesheet" href="./css/icons.css">
+    <link type="text/css" rel="stylesheet" href="./css/materialize.min.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <title>Text Parser</title>
+    <meta name="description" content="
+    A simple and powerful text parser that can sort lists, manipulate data,
+    and do pretty much everything you can imagine, and more.">
+
+    
+    <script src="./js/jquery.min.js"></script>
+    <script>
+    $(function() {
+        $(document).ready(function(){
+            $('select').formSelect();
+        });
+    });
+    </script>
+
+</head>
+
+<body style="background-color: #FFFFFF;">
+    <nav class="blue">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center" style="font-family: Roboto;
+            font-weight: 500;">Text Parser</a>
+            <ul id="nav-mobile" class="right waves-effect waves-light blue hoverable" style="height: 100%;">
+                <li><a><i class="material-icons-round">brightness_4</i></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2%; width: 85%;">
+        <div class="row valign-wrapper">
+            <form class="col s5">
+                <h5 style="color: black; font-size: x-large; font-family: Roboto;
+                font-weight: 300;">Input Text:</h5>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <textarea id="textarea1" class="materialize-textarea" 
+                        style="font-family: Roboto Mono; font-weight: 100; color: black;"></textarea>
+                        <label for="textarea1" style="font-family: Roboto Mono;
+                        font-weight: 100;">Text to parse</label>
+                    </div>
+                </div>
+            </form>
+
+            <div class="col s2 center-align">
+                <div class="input-field col s12">
+                    <input id="delimiter-thing" type="text" class="validate" style="color: black;
+                    font-family: Roboto Mono;">
+                    <label for="delimiter-thing" style="font-family: Roboto Mono;">Delimiter</label>
+                </div>
+                <a class="btn-floating btn-large waves-effect waves-light blue darken-2 hoverable">
+                    <i class="material-icons-round">play_arrow</i>
+                </a>
+            </div>
+
+            <form class="col s5">
+                <h5 style="color: black; font-size: x-large; font-family: Roboto;
+                font-weight: 300;">Output Text:</h5>
+                <div class="row right-align">
+                    <div class="input-field col s12">
+                        <input disabled value="Parsed text goes here"
+                        type="text" class="validate" style="font-family: Roboto Mono;
+                        font-weight: 100; color: black;">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <form class="col s4">
+                <div class="input-field col s12" style="color: black;">
+                    <select>
+                        <option value="0" selected>None</option>
+                        <option value="1">Alphabetical</option>
+                        <option value="2">Numeric</option>
+                        <option value="3">Length</option>
+                        <option value="4">Shuffle</option>
+                    </select>
+                    <label>Sort</label>
+                </div>
+                <div style="padding-left: 3%;">
+                    <label>
+                        <input type="checkbox"/>
+                        <span>Descending</span>
+                    </label>
+                </div>
+            </form>
+
+            <form class="col s4">
+                <h6 style="color: black; font-size: larger; font-family: Roboto;
+                font-weight: 300;">Replace:</h6>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <div class="row valign-wrapper">
+                            <div class="input-field col s5">
+                                <input id="first_name" type="text" class="validate">
+                                <label for="first_name">Text to replace</label>
+                            </div>
+                            <div class="col s2">
+                                <p> with </p>
+                            </div>
+                            <div class="input-field col s5">
+                                <input id="last_name" type="text" class="validate">
+                                <label for="last_name">Text to replace with</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <form class="col s4">
+                <h6 style="color: black; font-size: larger; font-family: Roboto;
+                font-weight: 300;">Add Characters:</h6>
+                <div class="col" style="width: 150%;">
+                    Before:
+                    <div class="input-field inline">
+                        <input id="email_inline" type="text" class="validate" style="width: 150%;">
+                        <label for="email_inline" style="font-size: 100%; width: 150%;">Characters to add before each element</label>
+                    </div>
+                    <br>
+                    After:
+                    <div class="input-field inline">
+                        <input id="email_inline" type="text" class="validate" style="width: 150%;">
+                        <label for="email_inline" style="font-size: 100%; width: 150%;">Characters to add after each element</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <form class="col s4">
+                <div class="input-field col s12" style="color: black;">
+                    <select>
+                        <option value="0" selected>None</option>
+                        <option value="1">lowercase</option>
+                        <option value="2">UPPERCASE</option>
+                        <option value="3">Sentence case</option>
+                        <option value="4">Capitalize Each Word</option>
+                        <option value="5">aLtErNaTe CaSe</option>
+                        <option value="6">RanDOM CasE</option>
+                    </select>
+                    <label>Cases</label>
+                </div>
+            </form>
+
+            <form class="col s4">
+                <h6 style="color: black; font-size: larger; font-family: Roboto;
+                font-weight: 300;">Misc:</h6>
+                <div class="col">        
+                    <label>
+                        <input type="checkbox"/>
+                        <span>Beautify</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="checkbox"/>
+                        <span>Remove Duplicates</span>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="checkbox"/>
+                        <span>Reverse Each Item</span>
+                    </label>
+                </div>        
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="./js/materialize.min.js"></script>
+</script>
+</body>
+</html>
