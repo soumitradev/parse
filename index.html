@@ -16,7 +16,7 @@
     <script src="./js/jquery.min.js"></script>
     <script>
     $(function() {
-
+        document.getElementById("delimiter-text").defaultValue = "hello";
         $(document).ready(function(){
             $('select').formSelect();
             $('.collapsible').collapsible();
@@ -24,12 +24,7 @@
 
         $("#parse-button").click(function(){
             var inputText = $("#input-text").val();
-            if($("#delimiter-text").val() == ""){
-                var delimiterText = " ";
-            }
-            else{
-                var delimiterText = $("#delimiter-text").val();
-            }
+            var delimiterText = $("#delimiter-text").val();
             var list = inputText.split(delimiterText);
             var sortPref = $("#sort-pref").val();
             var findText = $("#find-text").val();
